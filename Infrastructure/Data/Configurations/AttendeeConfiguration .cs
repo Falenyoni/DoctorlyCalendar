@@ -19,11 +19,6 @@ public class AttendeeConfiguration : IEntityTypeConfiguration<Attendee>
         builder.Property(e => e.Email)
             .HasMaxLength(1000);
 
-        builder.Property(e => e.CalendarEventId)
-            .HasConversion<string>()
-            .HasMaxLength(50)
-            .IsRequired();
-
         builder.Property(a => a.AttendenceStatus)
                     .HasConversion<string>()
                     .HasMaxLength(20);

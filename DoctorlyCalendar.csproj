@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Domain\DomainExceptions\" />
-    <Folder Include="Features\Events\" />
+    <Folder Include="Features\Events\GetEvents\" />
   </ItemGroup>
 
 </Project>
