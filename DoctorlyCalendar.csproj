@@ -24,4 +24,10 @@
     <Folder Include="Features\Events\GetEvents\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Tests\**" />
+    <Content Remove="Tests\**" />
+    <EmbeddedResource Remove="Tests\**" />
+  </ItemGroup>
+
 </Project>
