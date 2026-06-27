@@ -25,7 +25,6 @@ public class CalendarEventConfiguration : IEntityTypeConfiguration<CalendarEvent
             .IsRequired();
 
         builder.Property(e => e.RowVersion)
-            .IsRowVersion()
             .IsConcurrencyToken();
 
         builder.HasMany(e => e.Attendees)

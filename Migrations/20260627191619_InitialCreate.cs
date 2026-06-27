@@ -23,7 +23,7 @@ namespace DoctorlyCalendar.Migrations
                     CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     EventStatus = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "BLOB", rowVersion: true, nullable: false)
+                    RowVersion = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -37,7 +37,7 @@ namespace DoctorlyCalendar.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
-                    CalendarEventId = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    CalendarEventId = table.Column<Guid>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     AttendenceStatus = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false)

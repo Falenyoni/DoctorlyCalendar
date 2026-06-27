@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DoctorlyCalendar.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260627182704_InitialCreate")]
+    [Migration("20260627191619_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -31,9 +31,7 @@ namespace DoctorlyCalendar.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CalendarEventId")
-                        .IsRequired()
-                        .HasMaxLength(50)
+                    b.Property<Guid>("CalendarEventId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -81,11 +79,9 @@ namespace DoctorlyCalendar.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<Guid>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("TEXT");

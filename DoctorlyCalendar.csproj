@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <Folder Include="Domain\DomainExceptions\" />
+    <Folder Include="Features\Attendees\CreateNewAttendees\" />
+    <Folder Include="Features\Attendees\GetAttendeeById\" />
     <Folder Include="Features\Events\GetEvents\" />
   </ItemGroup>
 
