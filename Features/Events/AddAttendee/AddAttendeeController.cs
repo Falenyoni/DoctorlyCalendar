@@ -1,4 +1,3 @@
-using DoctorlyCalendar.Features.Events;
 using DoctorlyCalendar.Features.Events.CreateNewEvents;
 using DoctorlyCalendar.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +15,9 @@ public class AddAttendeeController(ICalendarEventRepository repository) : Contro
 
         if (calendarEvent is null)
             return NotFound($"Event with id '{id}' was not found.");
+
+        if (calendarEvent.RowVersion != request.RowVersion)
+            return Conflict("The event was modified by someone else. Please reload and try again.");
 
         calendarEvent.AddAttendee(request.Name, request.Email);
 

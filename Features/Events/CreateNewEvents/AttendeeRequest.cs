@@ -12,4 +12,7 @@ public record AttendeeRequest
     [EmailAddress]
     [MaxLength(254)]
     public string Email { get; set; } = string.Empty;
+
+    [Required]
+    public Guid RowVersion { get; set; }
 }
