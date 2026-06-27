@@ -8,6 +8,9 @@ namespace DoctorlyCalendar.Features.Events.SearchEvents;
 public class SearchEventsController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpGet("search")]
+    [EndpointSummary("Search calender events.")]
+    [EndpointDescription("Searches events by title or desciption.")]
+    [Tags("Events")]
     public async Task<IActionResult> Search([FromQuery] string term, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(term))

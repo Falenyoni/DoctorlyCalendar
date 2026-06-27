@@ -9,6 +9,9 @@ namespace DoctorlyCalendar.Features.Events.AddAttendee;
 public class AddAttendeeController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpPost("{id:guid}/attendees")]
+    [EndpointSummary("Add attendee to event.")]
+    [EndpointDescription("Adds attendee to an existing event, dulicate emails not allowed")]
+    [Tags("Attendees")]
     public async Task<IActionResult> AddAttendee(Guid id, [FromBody] AttendeeRequest request, CancellationToken cancellationToken)
     {
         var calendarEvent = await repository.GetByIdAsync(id, cancellationToken);

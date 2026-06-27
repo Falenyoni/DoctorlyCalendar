@@ -9,6 +9,9 @@ namespace DoctorlyCalendar.Features.Events.GetEventsById;
 public class GetEventByIdController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpGet("{id:guid}")]
+    [EndpointSummary("Get a calendar event by ID.")]
+    [EndpointDescription("Returns a single event including all attendees.")]
+    [Tags("Events")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var calendarEvent = await repository.GetByIdAsync(id, cancellationToken);

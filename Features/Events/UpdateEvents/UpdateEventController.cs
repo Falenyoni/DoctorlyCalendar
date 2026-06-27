@@ -9,6 +9,9 @@ namespace DoctorlyCalendar.Features.Events.UpdateEvents;
 public class UpdateEventController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpPut("{id:guid}")]
+    [EndpointSummary("Update a calendar event.")]
+    [EndpointDescription("Updates event details. Requires the current RowVersion to prevent overwriting concurrent changes.")]
+    [Tags("Events")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEventRequest request, CancellationToken cancellationToken)
     {
         var calendarEvent = await repository.GetByIdAsync(id, cancellationToken);

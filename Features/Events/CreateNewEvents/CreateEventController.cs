@@ -1,4 +1,5 @@
 using DoctorlyCalendar.Domain.Entities;
+using DoctorlyCalendar.Domain.Interfaces;
 using DoctorlyCalendar.Features.Events;
 using DoctorlyCalendar.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -7,9 +8,12 @@ namespace DoctorlyCalendar.Features.Events.CreateNewEvents;
 
 [ApiController]
 [Route("api/events")]
-public class CreateEventController(ICalendarEventRepository repository) : ControllerBase
+public class CreateEventController(ICalendarEventRepository repository, INotificationService notificationService) : ControllerBase
 {
     [HttpPost]
+    [EndpointSummary("Create a new calendar event.")]
+    [EndpointDescription("Creates a calendar event with optional attendees. Attendees can also be added later.")]
+    [Tags("Events")]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequest request, CancellationToken cancellationToken)
     {
         var calendarEvent = CalendarEvent.Create(
@@ -25,6 +29,7 @@ public class CreateEventController(ICalendarEventRepository repository) : Contro
         }
 
         await repository.AddAsync(calendarEvent, cancellationToken);
+        await notificationService.NotifyEventCreatedAsync(calendarEvent, cancellationToken);
 
         var response = MapToResponse(calendarEvent);
 

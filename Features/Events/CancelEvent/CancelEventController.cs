@@ -8,6 +8,9 @@ namespace DoctorlyCalendar.Features.Events.CancelEvent;
 public class CancelEventController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpDelete("{id:guid}")]
+    [EndpointSummary("Cancel a calendar event.")]
+    [EndpointDescription("Cancels an event. see Cancel() on CalendarEvent for buisness rules")]
+    [Tags("Events")]
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
         var calendarEvent = await repository.GetByIdAsync(id, cancellationToken);

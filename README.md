@@ -1,48 +1,68 @@
 # DoctorlyCalendar
 
-Calendar event management API built as part of a technical assessment.
+Backend API for managing calendar events and appointments within a doctor's practice.
 
-## How to run
+---
 
-```
-dotnet run
-```
+## How To Run
 
-Swagger at `https://localhost:{port}/swagger`. Database is SQLite and gets created automatically on first run.
+- Clone the repo
+- Open in Visual Studio or run `dotnet run` from the project root
+- Swagger UI available at `https://localhost:{port}/swagger`
+- No database setup needed — SQLite database is created automatically on first run
+- To run tests: `dotnet test Tests/DoctorlyCalendar.Tests.csproj`
 
-## What's in here
+---
 
-- Create calendar events with optional attendees in one request
-- Add attendees to an existing event after the fact
-- Attendees can accept or decline
-- Events can be cancelled or completed
-- Duplicate attendee emails on the same event are blocked
-- You can't update or add attendees to a cancelled event
+## Requirements
 
-Get/Search/Cancel/Complete endpoints still to be added.
+- Attendees must have a Name, Email Address, and attendance status (Pending / Accepted / Declined)
+- Events must have a Title, Description, Start Time, End Time, and a list of Attendees
+- Field sizes are limited (Title: 200 chars, Description: 2000 chars, Email: 254 chars)
+- Events have a status: Scheduled, Cancelled, Completed
+- Notifications capability must exist (currently stubbed with logging)
+- Data must be persisted
+- Solution must use DDD patterns and be properly layered
 
-## Stack
+---
 
-- .NET 8, ASP.NET Core
-- Entity Framework Core + SQLite (migrations run on startup)
-- No MediatR — handlers are just controllers for simplicity at this scale
+## API Functions
 
-## Structure
+Events
+- `POST /api/events` — Create a new event, optionally with attendees
+- `GET /api/events` — List all events with optional filters (`?from=`, `?to=`, `?status=`)
+- `GET /api/events/{id}` — Get a single event by ID
+- `GET /api/events/search?term=` — Search events by title or description
+- `PUT /api/events/{id}` — Update an event (requires RowVersion for concurrency)
+- `DELETE /api/events/{id}` — Cancel an event
 
-```
-Features/        <- one folder per operation (vertical slice)
-Domain/          <- entities and enums, no infrastructure dependencies
-Infrastructure/  <- EF Core, repository implementations
-```
+Attendees
+- `POST /api/events/{id}/attendees` — Add an attendee to an existing event
+- `PUT /api/events/{eventId}/attendees/{attendeeId}/accept` — Accept an event invitation
+- `PUT /api/events/{eventId}/attendees/{attendeeId}/decline` — Decline an event invitation
 
-## Decisions worth noting
+---
 
-**Rich domain model** — `CalendarEvent` and `Attendee` have private setters. You can't set `Title = "x"` from outside. You go through `Create()`, `Update()`, `Cancel()` etc. Guards live on the entity, not scattered across controllers.
+## Key Decisions
 
-**Attendee is not an aggregate root** — it can only be created through `CalendarEvent.AddAttendee()`. A standalone `POST /api/attendees` wouldn't make sense because an attendee without an event is meaningless.
+- DDD / Rich Domain Model — `CalendarEvent` and `Attendee` have private setters. State changes go through domain methods (`Create`, `Update`, `Cancel`, `AddAttendee`, `Accept`, `Decline`). Guards and business rules live on the entity, not in controllers
+- Attendee is not an aggregate root — Attendees are created exclusively through `CalendarEvent.AddAttendee()`. An attendee without an event has no meaning in this domain
+- Optimistic concurrency via RowVersion — Every event carries a `RowVersion` (Guid). Write operations (Update, AddAttendee) check the client's RowVersion against the database before saving. A mismatch returns `409 Conflict`
+- Vertical slice structure — Each operation lives in its own folder under `Features/Events/`. One controller, one responsibility, one reason to change
+- No MediatR — At this scale MediatR adds ceremony without value. Controllers call the repository directly. If the app grew, handlers would move into a dedicated application layer
+- Notification interface in Domain — `INotificationService` is defined in the Domain layer. The stub implementation (`LoggingNotificationService`) lives in Infrastructure. Swapping to email or a message queue requires no changes to domain or controllers
+- SQLite for persistence — Chosen for simplicity and portability. No database server required to run the solution
+- ICalendarEventRepository in Infrastructure — Ideally this interface belongs in Domain so the domain defines its own contract. Kept in Infrastructure here as a pragmatic call to avoid extra project setup within the time limit
 
-**RowVersion is a Guid** — normally this would be a SQL Server `rowversion` (byte[]). SQLite doesn't support that, so it's a `Guid` we generate ourselves on every write. Same optimistic concurrency idea, different mechanism.
+---
 
-**ICalendarEventRepository is in Infrastructure** — ideally it lives in Domain so the domain defines its own contract. Kept it in Infrastructure here as a pragmatic call to avoid extra project setup for an assessment. Worth fixing in a real codebase.
+## Improvements
 
-**No MediatR** — didn't add it because at this scale it adds ceremony without value. Controllers talk directly to the repository. If the app grew, the handlers would move into a service/application layer.
+- Switch to SQL Server or PostgreSQL — SQLite has limitations (no native `DateTimeOffset` ORDER BY, no `rowversion` type). A production database would remove these workarounds
+- Native RowVersion — Replace the Guid concurrency token with a SQL Server `rowversion` (`byte[]`) or PostgreSQL `xmin`. The database would then manage the token automatically instead of the application
+- Move ICalendarEventRepository to Domain — Proper DDD structure has the domain defining its own repository contracts, with Infrastructure implementing them
+- Real notification implementation — Replace `LoggingNotificationService` with an email sender (SendGrid, SMTP), iCal generator, or a message queue (RabbitMQ, Azure Service Bus)
+- Separate class libraries — Domain, Application, and Infrastructure as separate `.csproj` files would enforce layer boundaries at compile time instead of relying on convention
+- Authentication and authorisation — No auth is implemented. A real system would need identity (who is the doctor, who is the patient) before allowing mutations
+- Pagination — The `GET /api/events` endpoint returns all records. In production this needs pagination
+- Soft delete — Cancelled events are flagged via status but not removed. An `IsDeleted` filter could hide them from default queries

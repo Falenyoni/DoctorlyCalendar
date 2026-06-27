@@ -10,6 +10,9 @@ namespace DoctorlyCalendar.Features.Events.GetEvents;
 public class GetEventsController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpGet]
+    [EndpointSummary("List all calendar events.")]
+    [EndpointDescription("Returns all events with optional filters by date range and status. TODO: add pagination")]
+    [Tags("Events")]
     public async Task<IActionResult> GetAll(
         [FromQuery] DateTimeOffset? from,
         [FromQuery] DateTimeOffset? to,

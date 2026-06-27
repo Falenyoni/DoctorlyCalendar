@@ -8,6 +8,9 @@ namespace DoctorlyCalendar.Features.Events.DeclineEvent;
 public class DeclineEventController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpPut("{eventId:guid}/attendees/{attendeeId:guid}/decline")]
+    [EndpointSummary("Decline an event invitation.")]
+    [EndpointDescription("Marks an attendee's status as Declined for the given event.")]
+    [Tags("Attendees")]
     public async Task<IActionResult> Decline(Guid eventId, Guid attendeeId, CancellationToken cancellationToken)
     {
         var calendarEvent = await repository.GetByIdAsync(eventId, cancellationToken);

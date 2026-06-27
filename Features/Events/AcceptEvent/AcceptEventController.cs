@@ -8,6 +8,9 @@ namespace DoctorlyCalendar.Features.Events.AcceptEvent;
 public class AcceptEventController(ICalendarEventRepository repository) : ControllerBase
 {
     [HttpPut("{eventId:guid}/attendees/{attendeeId:guid}/accept")]
+    [EndpointSummary("Accept an event invitation.")]
+    [EndpointDescription("Marks an attendee's status as Accepted for the given event.")]
+    [Tags("Attendees")]
     public async Task<IActionResult> Accept(Guid eventId, Guid attendeeId, CancellationToken cancellationToken)
     {
         var calendarEvent = await repository.GetByIdAsync(eventId, cancellationToken);
