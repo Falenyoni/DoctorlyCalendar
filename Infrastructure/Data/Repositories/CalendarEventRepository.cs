@@ -1,4 +1,5 @@
 ﻿using DoctorlyCalendar.Domain.Entities;
+using DoctorlyCalendar.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoctorlyCalendar.Infrastructure.Data.Repositories;
@@ -10,10 +11,22 @@ public class CalendarEventRepository(AppDbContext context) : ICalendarEventRepos
         .Include(e => e.Attendees)
         .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-    public async Task<IEnumerable<CalendarEvent>> GetAllAsync(CancellationToken cancellationToken = default)
-        => await context.CalendarEvents
-            .Include(e => e.Attendees)
-            .ToListAsync(cancellationToken);
+    public async Task<IEnumerable<CalendarEvent>> GetAllAsync(DateTimeOffset? from, DateTimeOffset? to, EventStatus? status, CancellationToken cancellationToken = default)
+    {
+        var query = context.CalendarEvents.Include(e => e.Attendees).AsQueryable();
+
+        if (from.HasValue)
+            query = query.Where(e => e.StartTime >= from.Value);
+
+        if (to.HasValue)
+            query = query.Where(e => e.EndTime <= to.Value);
+
+        if (status.HasValue)
+            query = query.Where(e => e.EventStatus == status.Value);
+
+        var results = await query.ToListAsync(cancellationToken);
+        return results.OrderBy(e => e.StartTime);
+    }
 
     public async Task AddAsync(CalendarEvent calendarEvent, CancellationToken cancellationToken = default)
     {

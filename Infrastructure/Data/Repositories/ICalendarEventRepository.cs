@@ -1,4 +1,5 @@
 ﻿using DoctorlyCalendar.Domain.Entities;
+using DoctorlyCalendar.Domain.Enums;
 
 namespace DoctorlyCalendar.Infrastructure.Data.Repositories;
 
@@ -6,7 +7,7 @@ public interface ICalendarEventRepository
 {
     Task<CalendarEvent?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<CalendarEvent>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<CalendarEvent>> GetAllAsync(DateTimeOffset? from, DateTimeOffset? to, EventStatus? status, CancellationToken cancellationToken = default);
 
     Task AddAsync(CalendarEvent calendarEvent, CancellationToken cancellationToken = default);
 
